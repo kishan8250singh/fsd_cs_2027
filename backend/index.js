@@ -1,7 +1,7 @@
 const http = require('http');
 const PORT = 4004;
 const apidata = require('./apiCalling.js');
-const datawrite = require('./usefsmodule.js');
+const {dataread,datawrite,deletefile,readfilesync} = require('./usefsmodule.js');
 const server = http.createServer(async(req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -27,7 +27,7 @@ const server = http.createServer(async(req, res) => {
 //  res.setHeader('Content-Type', 'text/json');
 //  res.end('Hello World');
  if(req.url==='/data' && req.method === 'POST'){
-   res.setHeader('Content-Type', 'application/json');
+   res.setHeader('Content-Type','application/json');
    const data = {
      name: "John Doe",
      age: 30,
@@ -44,6 +44,33 @@ const server = http.createServer(async(req, res) => {
    res.setHeader('Content-Type', 'application/json');
    const jsonData =  datawrite();
     res.end(JSON.stringify({msg:jsonData}));
+ }
+ else if(req.url==='/dataread' && req.method === 'GET'){
+   res.setHeader('Content-Type', 'application/json');
+   const jsonData =  dataread();
+    res.end(JSON.stringify({msg:jsonData}));
+ }
+ else if(req.url==='/datadelete' && req.method === 'DELETE'){
+   res.setHeader('Content-Type', 'application/json');
+   const jsonData =  deletefile();
+    res.end(JSON.stringify({msg:jsonData}));
+ }
+ else if(req.url==='/readfilesync' && req.method === 'GET'){
+   res.setHeader('Content-Type', 'application/json');
+   const jsonData = await readfilesync();
+    res.end(JSON.stringify({msg:jsonData}));
+ } 
+ else if(req.url==='/register' && req.method === 'POST'){
+   res.setHeader('Content-Type', 'application/json');
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const userData = JSON.parse(body);
+        console.log("Received user data:", userData);
+        res.end(JSON.stringify({msg:"User registered successfully", data: userData}));
+    });
  }
  else{
     res.setHeader('Content-Type', 'text/html');
